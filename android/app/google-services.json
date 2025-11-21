@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "740561518648",
+    "project_id": "skymessage-e1f53",
+    "storage_bucket": "skymessage-e1f53.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:740561518648:android:0c235a306d865e24dfe6cd",
+        "android_client_info": {
+          "package_name": "com.example.sky_message"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAEy2pFCC4DVgJiYslEMOfNVbUYoWyVFhU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
