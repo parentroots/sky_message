@@ -149,6 +149,9 @@ class SignUpScreen extends StatelessWidget {
           ),
           SizedBox(height: 5),
           Card(elevation: 5, child: TextFormField(
+            decoration: InputDecoration(
+                hintText: "Enter userName or email"
+            ),
             controller: emailTEController,
           )),
 
@@ -161,6 +164,9 @@ class SignUpScreen extends StatelessWidget {
           ),
           SizedBox(height: 5),
           Card(elevation: 5, child: TextFormField(
+            decoration: InputDecoration(
+                hintText: "Enter password"
+            ),
             controller: passTEController,
           )),
 
@@ -174,6 +180,9 @@ class SignUpScreen extends StatelessWidget {
           ),
           SizedBox(height: 5),
           Card(elevation: 5, child: TextFormField(
+            decoration: InputDecoration(
+                hintText: "Re-enter your password"
+            ),
             controller: retypePassTEController,
           )),
         ],

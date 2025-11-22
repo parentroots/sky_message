@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:sky_message/View/Widget/app_bar.dart';
 import '../../Controller/chat_controller.dart';
 import '../../Utils/helpers.dart';
 
@@ -29,77 +30,94 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.friendName)),
-      body: Column(
-        children: [
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('chats')
-                  .doc(roomId)
-                  .collection('messages')
-                  .orderBy('time')
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
-                final msgs = snapshot.data!.docs;
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (scrollC.hasClients) scrollC.jumpTo(scrollC.position.maxScrollExtent);
-                });
-                return ListView.builder(
-                  controller: scrollC,
-                  itemCount: msgs.length,
-                  itemBuilder: (context, i) {
-                    final m = msgs[i];
-                    bool isMe = m['senderId'] == myId;
-                    return Align(
-                      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-                      child: Container(
-                        padding: EdgeInsets.all(10),
-                        margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                        decoration: BoxDecoration(
-                          color: isMe ? Colors.blue : Colors.grey[300],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(m['message'], style: TextStyle(color: isMe ? Colors.white : Colors.black)),
-                            SizedBox(height: 6),
-                            Text(formatTimestamp(m['time']), style: TextStyle(fontSize: 10, color: isMe ? Colors.white70 : Colors.black54)),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
+      backgroundColor: Colors.blue,
+      appBar: PreferredSize(preferredSize: Size.fromHeight(60),
+      child: CustomAppBar(name:widget.friendName)),
+      body: Stack(
+        children: [Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(15),topRight: Radius.circular(15)),
+            color: Colors.white
+
           ),
-          Divider(height: 1),
-          Padding(
-            padding: EdgeInsets.all(8),
-            child: Row(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Column(
               children: [
                 Expanded(
-                  child: TextField(
-                    controller: textC,
-                    decoration: InputDecoration(hintText: 'Type message...', border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))),
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('chats')
+                        .doc(roomId)
+                        .collection('messages')
+                        .orderBy('time')
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+                      final msgs = snapshot.data!.docs;
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (scrollC.hasClients) scrollC.jumpTo(scrollC.position.maxScrollExtent);
+                      });
+                      return ListView.builder(
+                        controller: scrollC,
+                        itemCount: msgs.length,
+                        itemBuilder: (context, i) {
+                          final m = msgs[i];
+                          bool isMe = m['senderId'] == myId;
+                          return Align(
+                            alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                              decoration: BoxDecoration(
+                                color: isMe ? Colors.blue : Colors.grey[300],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(m['message'], style: TextStyle(color: isMe ? Colors.white : Colors.black)),
+                                  SizedBox(height: 6),
+                                  Text(formatTimestamp(m['time']), style: TextStyle(fontSize: 10, color: isMe ? Colors.white70 : Colors.black54)),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
                   ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: () {
-                    if (textC.text.trim().isNotEmpty) {
-                      chatC.sendMessage(widget.friendId, textC.text.trim());
-                      textC.clear();
-                    }
-                  },
+                Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Card(
+                          color: Colors.white60,
+                          child: TextField(
+                            controller: textC,
+                            decoration: InputDecoration(hintText: 'Type message...', border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.send,color: Colors.blue,size: 36,),
+                        onPressed: () {
+                          if (textC.text.trim().isNotEmpty) {
+                            chatC.sendMessage(widget.friendId, textC.text.trim());
+                            textC.clear();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-        ],
+        ),
+    ]
       ),
     );
   }
