@@ -4,7 +4,6 @@ import 'package:sky_message/Utils/AppColors/app_colors.dart';
 import 'package:sky_message/Utils/AppString/app_string.dart';
 import 'package:sky_message/View/Screen/AuthScreen/sign_up_screen.dart';
 import 'package:sky_message/View/Screen/BottomNav/main_bottom_nav_screen.dart';
-import 'package:sky_message/View/Screen/BottomNav/user_list_screen.dart';
 
 import '../../../Controller/auth_controller.dart';
 
@@ -12,6 +11,8 @@ class LoginPage extends StatelessWidget {
   final emailTEController = TextEditingController();
   final passTEController = TextEditingController();
   final auth = Get.find<AuthController>();
+
+  bool isLoginProgress=false;
 
   @override
   Widget build(BuildContext context) {
@@ -81,23 +82,29 @@ class LoginPage extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 child: InkWell(
                   onTap: onTapLoginButton,
-                  child: Container(
-                    height: 50,
-                    width: 100,
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        bottomLeft: Radius.circular(12),
+                  child: Visibility(
+                    visible: isLoginProgress==false,
+                    replacement:Center(child: CircularProgressIndicator(
+                      color: Colors.blue,
+                    )),
+                    child: Container(
+                      height: 50,
+                      width: 100,
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(12),
+                          bottomLeft: Radius.circular(12),
+                        ),
                       ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        "Login",
-                        style: TextStyle(
-                          color: AppColors.whiteColor,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600,
+                      child: Center(
+                        child: Text(
+                          "Login",
+                          style: TextStyle(
+                            color: AppColors.whiteColor,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
@@ -147,6 +154,9 @@ class LoginPage extends StatelessWidget {
           ),
           SizedBox(height: 5),
           Card(elevation: 5, child: TextFormField(
+            decoration: InputDecoration(
+              hintText: "Enter userName or email"
+            ),
             controller: emailTEController,
 
           )),
@@ -160,6 +170,9 @@ class LoginPage extends StatelessWidget {
           ),
           SizedBox(height: 5),
           Card(elevation: 5, child: TextFormField(
+            decoration: InputDecoration(
+                hintText: "Enter password"
+            ),
             controller: passTEController,
           )),
         ],
@@ -214,14 +227,17 @@ class LoginPage extends StatelessWidget {
   }
 
   Future<void> onTapLoginButton() async {
+    isLoginProgress=true;
     final err = await auth.signIn(
       emailTEController.text.trim(),
       passTEController.text.trim(),
     );
 
     if (err != null) {
+      isLoginProgress=false;
       Get.snackbar("Error", err);
     } else {
+      isLoginProgress=false;
       Get.off(() => MainBottomNavScreen());
     }
   }

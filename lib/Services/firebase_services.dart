@@ -1,37 +1,59 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_database/firebase_database.dart';
-
 
 class FirebaseService {
-  FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  FirebaseDatabase _realtime = FirebaseDatabase.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final users = FirebaseFirestore.instance.collection('users');
 
-
-  Future<void> createUserInFirestore({required String uid, required String name, required String email}) async {
-    await _firestore.collection('users').doc(uid).set({
+  /// ------------------ Create User ------------------
+  Future<void> createUserInFirestore({
+    required String uid,
+    required String name,
+    required String email,
+  }) async {
+    await users.doc(uid).set({
       'uid': uid,
       'name': name,
       'email': email,
       'photo': '',
       'online': true,
-      'lastSeen': FieldValue.serverTimestamp(),
+      'lastSeen': DateTime.now().millisecondsSinceEpoch, // fixed
+    }, SetOptions(merge: true));
+  }
+
+  /// ------------------ Send Message ------------------
+  Future<void> sendMessage(String roomId, Map<String, dynamic> msg) async {
+    await _firestore
+        .collection('chats')
+        .doc(roomId)
+        .collection('messages')
+        .add(msg);
+
+    await _firestore.collection('chats').doc(roomId).set({
+      'lastMessage': msg['message'],
+      'lastTime': DateTime.now().millisecondsSinceEpoch,
+    }, SetOptions(merge: true));
+  }
+
+  /// ------------------ Message Stream ------------------
+  Stream<QuerySnapshot> messagesStream(String roomId) {
+    return _firestore
+        .collection('chats')
+        .doc(roomId)
+        .collection('messages')
+        .orderBy('time')
+        .snapshots();
+  }
+
+  /// ------------------ Users Stream ------------------
+  Stream<QuerySnapshot> usersStream() {
+    return users.snapshots();
+  }
+
+  /// ------------------ Online / Offline ------------------
+  Future<void> setOnlineStatus(String uid, bool isOnline) async {
+    await users.doc(uid).update({
+      "online": isOnline,
+      'lastSeen': DateTime.now().millisecondsSinceEpoch,
     });
   }
-
-
-  Future<void> sendMessage(String roomId, Map<String, dynamic> msg) async {
-    await _firestore.collection('chats').doc(roomId).collection('messages').add(msg);
-    await _firestore.collection('chats').doc(roomId).set({'lastMessage': msg['message'], 'lastTime': FieldValue.serverTimestamp()}, SetOptions(merge: true));
-  }
-
-
-  Stream<QuerySnapshot> messagesStream(String roomId) {
-    return _firestore.collection('chats').doc(roomId).collection('messages').orderBy('time').snapshots();
-  }
-
-
-  Stream<QuerySnapshot> usersStream() => _firestore.collection('users').snapshots();
-
-
-  DatabaseReference statusRef(String uid) => _realtime.ref('status/$uid');
 }
