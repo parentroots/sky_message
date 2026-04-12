@@ -4,7 +4,7 @@ class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final users = FirebaseFirestore.instance.collection('users');
 
-  /// ------------------ Create User ------------------
+  /// ------------------ Create User ----------------------
   Future<void> createUserInFirestore({
     required String uid,
     required String name,
@@ -20,7 +20,7 @@ class FirebaseService {
     }, SetOptions(merge: true));
   }
 
-  /// ------------------ Send Message ------------------
+  /// ------------------ Send Message ---------------------
   Future<void> sendMessage(String roomId, Map<String, dynamic> msg) async {
     await _firestore
         .collection('chats')
@@ -44,7 +44,7 @@ class FirebaseService {
         .snapshots();
   }
 
-  /// ------------------ Users Stream ------------------
+  /// ------------------ Users Stream ---------------------
   Stream<QuerySnapshot> usersStream() {
     return users.snapshots();
   }
