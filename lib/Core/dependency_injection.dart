@@ -9,5 +9,9 @@ class DependencyInjection extends Bindings{
     Get.lazyPut<AuthController>(() => AuthController(),fenix: true);
     Get.lazyPut<ChatController>(() => ChatController(),fenix: true);
 
+
+
+
+    
   }
 }
