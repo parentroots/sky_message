@@ -46,6 +46,7 @@ class FirebaseService {
         .snapshots();
   }
 
+  
   /// ------------------ Users Stream ---------------------
   Stream<QuerySnapshot> usersStream() {
     return users.snapshots();
